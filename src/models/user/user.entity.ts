@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, ObjectID, ObjectIdColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Person } from '../person/person.entity';
 
 
@@ -21,4 +21,7 @@ export class User  {
 
   @Column({ nullable: true })
   personId: string;
+
+  @Column({ default: false})
+  isDeleted: boolean
 }

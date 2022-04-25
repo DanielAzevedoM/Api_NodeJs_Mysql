@@ -1,6 +1,4 @@
 import { Request, Response } from "express";
-import { CreateAdressDto } from '../../dtos/adress/adress.dto';
-import { UpdateAdressDto } from '../../dtos/adress/adress.update.dto';
 import { AdressService } from '../../services/adress/adress.service';
 
 const adressService = new AdressService()

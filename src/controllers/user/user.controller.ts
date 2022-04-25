@@ -36,7 +36,7 @@ class UserController {
         
         const params = request.params;
 
-        const result = await userService.update(params.id, user)
+        const result = await userService.update(params, user)
 
         if(result instanceof Error) return response.status(400).json(result.message);
 

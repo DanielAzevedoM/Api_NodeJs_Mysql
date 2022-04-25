@@ -1,5 +1,4 @@
-
-import { getRepository, Repository } from 'typeorm';
+import { getRepository } from 'typeorm';
 import { User as UserEntity} from '../../models/user/user.entity';
 import { User } from '../../interfaces/user/user.interface';
 import { UpdateUser } from '../../interfaces/user/user.update.interface'
@@ -27,17 +26,21 @@ export class UserService {
     async findOne(id: string): Promise<UserEntity | Error>{
         const userRepository =  getRepository(UserEntity)
 
-        const findUser = await userRepository.findOne(id);
+        const findUser = await userRepository.findOne({ id: id});
 
         if(!findUser) return new Error("User not exists");
         
         return findUser;
     }
 
-    async update(id: string, user:  UpdateUser): Promise<UserEntity | Error>{
+    async update( params,  user:  UpdateUser): Promise<UserEntity | Error>{
         const userRepository =  getRepository(UserEntity);
      
-        const findUser = await userRepository.findOne(id);
+        const findUser = await userRepository.findOne({ id: params.id});
+
+        const checkUserExists = await userRepository.findOne({email: user.newEmail})
+        
+        if(checkUserExists) return new Error("Email already exits!");
 
         if(!findUser) return new Error("User not exists");
 
@@ -53,10 +56,15 @@ export class UserService {
     async remove(id: string): Promise<UserEntity | Error>{
         const userRepository =  getRepository(UserEntity);
 
-        const findUser = await userRepository.findOne(id);
+        const findUser = await userRepository.findOne({ id: id});
 
         if(!findUser) return new Error("User not exists");
 
-        return userRepository.remove(findUser);
+        const userDeleted = {
+            ...findUser,
+            isDeleted: true
+        }
+
+        return userRepository.save(userDeleted);
     }
 }

@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-import { CreateUserDto } from "../../dtos/user/user.dto";
 import { PersonService } from "../../services/person/person.service";
 
 

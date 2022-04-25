@@ -11,7 +11,7 @@ export class PersonService {
 
         const personRepository = getRepository(PersonEntity);
 
-        const findUser = await userRepository.findOne(param.userId);
+        const findUser = await userRepository.findOne({ id: param.userId});
 
         if(!findUser) return new Error("User not Exists")
 
@@ -21,7 +21,7 @@ export class PersonService {
     async updateFk(id: string, person: Person): Promise<UserEntity | Error>{
         const userRepository = getRepository(UserEntity);
 
-		const findUser = await userRepository.findOne(id)
+		const findUser = await userRepository.findOne({ id: id});
 
 		if(!findUser) return new Error("User nots Exists!");
 
@@ -39,11 +39,10 @@ export class PersonService {
 
         const personRepository = getRepository(PersonEntity);
 
-		const findUser = await userRepository.findOne(params.userId);
+		const findUser = await userRepository.findOne({ id: params.userId});
        
-		const findPerson = await personRepository.findOne(findUser.personId);
+		const findPerson = await personRepository.findOne({ id: findUser.personId});
 
-		if(findPerson.id !== findUser.personId) return new Error("Person not Exists!");
 		if(!findUser) return new Error("User not exists!");
 		if(!findPerson) return new Error("Person not exists!");
 
@@ -58,17 +57,14 @@ export class PersonService {
 	}
 
 	async findOne(params): Promise<PersonEntity | Error>{
-
-        
-        const userRepository = getRepository(UserEntity);
+		const userRepository = getRepository(UserEntity);
 
         const personRepository = getRepository(PersonEntity);
 
-		const findUser = await userRepository.findOne(params.userId);
+		const findUser = await userRepository.findOne({ id: params.userId});
 
-		const findPerson = await personRepository.findOne(findUser.personId);
+		const findPerson = await personRepository.findOne({ id: findUser.personId});
 
-		if(findPerson.id !== findUser.personId) return new Error("Person id not exists in User!");
 		if(!findUser) return new Error("User not exists!");
 		if(!findPerson) return new Error("Person not exists!");
 	
@@ -80,11 +76,10 @@ export class PersonService {
 
         const personRepository = getRepository(PersonEntity);
 
-		const findUser = await userRepository.findOne(params.userId);
+		const findUser = await userRepository.findOne({ id: params.userId});
 
-		const findPerson = await personRepository.findOne(findUser.personId);
+		const findPerson = await personRepository.findOne({ id: findUser.personId});
 
-		if(findPerson.id !== findUser.personId) return new Error("Person id not exists in User!");
 		if(!findUser) return new Error("User not exists!");
 		if(!findPerson) return new Error("Person not exists!");
 

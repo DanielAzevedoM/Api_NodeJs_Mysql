@@ -1,7 +1,6 @@
 
 import { getRepository } from 'typeorm';
 import { Adress as AdressEntity } from '../../models/adress/adress.entity';
-import { User as UserEntity } from '../../models/user/user.entity';
 import { Person as PersonEntity } from '../../models/person/person.entity';
 import { Adress } from '../../interfaces/adress/adress.interface';
 import { UpdateAdress } from '../../interfaces/adress/adress.update.interface';
@@ -11,18 +10,12 @@ import { UpdateAdress } from '../../interfaces/adress/adress.update.interface';
 
 export class AdressService {
     async create(params, adress: Adress): Promise<AdressEntity | Error>{
-        const userRepository = getRepository(UserEntity);
-
         const personRepository = getRepository(PersonEntity);
 
         const adressRepository = getRepository(AdressEntity);
 
-        const findUser = await userRepository.findOne(params.userId);
-
-        const findPerson = await personRepository.findOne(findUser.personId);
+        const findPerson = await personRepository.findOne({ id: params.personId});
         
-        if(findUser.personId !== findPerson.id) return new Error("Person not exists!");
-       	if(!findUser) return new Error("User not exists!");
 		if(!findPerson) return new Error("Person not Exists!");
 
 
@@ -30,15 +23,11 @@ export class AdressService {
     }
     
     async updateFk(params, adress: Adress): Promise<AdressEntity> {   
-        const userRepository = getRepository(UserEntity);
-
         const personRepository = getRepository(PersonEntity);
 
         const adressRepository = getRepository(AdressEntity); 
 
-        const findUser = await userRepository.findOne(params.userId);
-
-        const findPerson = await personRepository.findOne(findUser.personId);
+        const findPerson = await personRepository.findOne({ id: params.personId });
 
         const updateFk = {
             ...adress,
@@ -50,21 +39,14 @@ export class AdressService {
     }
 
     async findAll(params): Promise<AdressEntity[] | Error>{
-        const userRepository = getRepository(UserEntity);
-
         const personRepository = getRepository(PersonEntity);
 
         const adressRepository = getRepository(AdressEntity); 
         
-        const findUser = await userRepository.findOne(params.userId)
-       
-        const findPerson = await personRepository.findOne(findUser.personId)
+        const findPerson = await personRepository.findOne({ id: params.personId})
 
         const findAdress = await adressRepository.find()
    
-     
-        if(findUser.personId !== findPerson.id) return new Error("Person not exists!");
-        if(!findUser) return new Error("User not exists!");
         if(!findPerson) return new Error("Person not Exists!");
         if(!findAdress) return new Error("Adress not Exists!");
 
@@ -72,20 +54,14 @@ export class AdressService {
     }
 
     async findOne(params): Promise<AdressEntity | Error>{
-        const userRepository = getRepository(UserEntity);
-
-        const personRepository = getRepository(PersonEntity);
+       const personRepository = getRepository(PersonEntity);
 
         const adressRepository = getRepository(AdressEntity); 
 
-        const findUser = await userRepository.findOne(params.userId)
+        const findPerson = await personRepository.findOne({ id: params.personId })
 
-        const findPerson = await personRepository.findOne(findUser.personId)
+        const findAdress = await adressRepository.findOne({ id: params.id})
 
-        const findAdress = await adressRepository.findOne(params.id)
-
-        if(findUser.personId !== findPerson.id) return new Error("Person not exists!");
-        if(!findUser) return new Error("User not exists!");
         if(!findPerson) return new Error("Person not Exists!");
         if(!findAdress) return new Error("Adress not Exists!");
 
@@ -93,20 +69,14 @@ export class AdressService {
     }
 
     async update(params, adress: UpdateAdress): Promise<AdressEntity |  Error>{
-        const userRepository = getRepository(UserEntity);
-
         const personRepository = getRepository(PersonEntity);
 
         const adressRepository = getRepository(AdressEntity); 
 
-        const findUser = await userRepository.findOne(params.userId);
+        const findPerson = await personRepository.findOne({ id: params.personId});
 
-        const findPerson = await personRepository.findOne(findUser.personId);
+        const findAdress = await adressRepository.findOne({ id: params.id});
 
-        const findAdress = await adressRepository.findOne(params.id);
-
-        if(findUser.personId !== findPerson.id) return new Error("Person not exists!");
-        if(!findUser) return new Error("User not exists!");
         if(!findPerson) return new Error("Person not Exists!");
         if(!findAdress) return new Error("Adress not Exists!");
 
@@ -123,27 +93,18 @@ export class AdressService {
     }
 
     async remove(params): Promise<AdressEntity | Error>{
-
-        const userRepository = getRepository(UserEntity);
-
         const personRepository = getRepository(PersonEntity);
 
         const adressRepository = getRepository(AdressEntity); 
       
-        const findUser = await userRepository.findOne(params.userId);
+        const findPerson = await personRepository.findOne({ id: params.personId});
 
-        const findPerson = await personRepository.findOne(findUser.personId);
+        const findAdress = await adressRepository.findOne({ id: params.id});
 
-        const findAdress = await adressRepository.findOne(params.id);
-
-        if(findUser.personId !== findPerson.id) return new Error("Person not exists!");
-        if(!findUser) return new Error("User not exists!");
         if(!findPerson) return new Error("Person not Exists!");
         if(!findAdress) return new Error("Adress not Exists!");
 
         return adressRepository.remove(findAdress);
     }
-
-
     
 }

@@ -92,6 +92,27 @@ export class PersonService {
 
          return personRepository.save(personUpdate);    
     }
+
+	async updateSelfie(params, selfie: string){
+		const userRepository = getRepository(UserEntity);
+
+        const personRepository = getRepository(PersonEntity);
+
+		const findUser = await userRepository.findOne({ id: params.userId });
+
+		const findPerson = await personRepository.findOne({ id: findUser.personId });
+
+		if(!findUser) return null;
+		if(!findPerson) return null;
+
+		const updateSelfie = {
+			...findPerson,
+			selfie: selfie
+		}
+
+		return personRepository.save(updateSelfie)
+	}
+	
 	
 
 }

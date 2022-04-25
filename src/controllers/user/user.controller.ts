@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-import { CreateUserDto } from "../../dtos/user/user.dto";
 import { UserService } from "../../services/user/user.service";
 
 const userService = new UserService();

@@ -53,6 +53,16 @@ class PersonController {
 
         return response.json(result)
     }
+
+    async updateSelfie(request, response){
+        const params = request.params;
+
+        const file = request.file;
+
+        const result = await personService.updateSelfie(params, file.path)
+
+        return response.json(result);
+    }
      
 }
 

@@ -13,7 +13,7 @@ export class AdressController {
 
         if(createAdress instanceof Error) return response.status(400).json(createAdress.message);
 
-        const result =  await adressService.updateFk(params, adress);
+        const result =  await adressService.updateFk(params, createAdress);
 
         return response.json(result);
     }

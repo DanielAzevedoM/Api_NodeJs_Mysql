@@ -9,6 +9,7 @@ const personController = new PersonController()
 
 personRoutes.post('/user/person', AuthMiddleware, personController.create)
 personRoutes.get('/user/person', AuthMiddleware, personController.findOne)
+personRoutes.post('/user/person/location', AuthMiddleware, personController.findByLocation)
 personRoutes.put('/user/person', AuthMiddleware, personController.update)
 personRoutes.delete('/user/person', AuthMiddleware, personController.remove)
 personRoutes.patch('/user/person', AuthMiddleware, multer(multerConfig).single('image'), personController.updateSelfie )

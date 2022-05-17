@@ -28,6 +28,16 @@ class PersonController {
         return response.json(result);
     }
 
+    async findByLocation(request: Request, response: Response){
+        const location = request.body
+
+        const result = await personService.findByLocation(request.personId, location);
+
+        if(result instanceof Error) return response.status(400).json(result.message);
+    
+        return response.json(result);
+    }
+
     async update(request: Request, response: Response){
         const person = request.body;
 

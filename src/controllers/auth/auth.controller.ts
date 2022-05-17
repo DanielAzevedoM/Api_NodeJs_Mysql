@@ -1,24 +1,41 @@
-import { Request, Response } from 'express';
-import { getRepository } from 'typeorm';
-import jwt from 'jsonwebtoken'
+import { Request, response, Response } from 'express';
 
-import { User } from '../../models/user/user.entity';
+import { AuthService } from '../../services/auth/auth.service';
+
+const authService = new AuthService();
 
 export class AuthController {
+
     async authenticate(req: Request, res: Response){
-        const repository = getRepository(User);
-        const { email, password} = req.body;
+        const { email, password } = req.body;
 
-        const user = await repository.findOne({ email: email, password: password});
+        const validateUser = await authService.validateUser(email, password)
 
-        if(!user){
-            return res.sendStatus(401)
-        }
+        if(validateUser instanceof Error) return response.status(400).json(validateUser.message);
+   
+        const result = await authService.login(validateUser)
+       
+        return res.json(result)
+      
+    }
 
-        const token = jwt.sign({ id: user.id }, 'secret', {expiresIn: '7d'})
 
-        delete user.password;
+    async create(request: Request, response: Response){
+        const user = request.body;
 
-        return res.json({ user, token})
+        const result = await authService.create(user);
+
+        if(result instanceof Error) return response.status(400).json(result.message);
+    
+        return response.json(result);
+
+    }
+
+    async changePassword(request: Request, response: Response){
+        const { newPassword } = request.body;
+
+        await authService.updatePassword(request.email, newPassword)
+
+        return response.json({ message: "Password Updated"})
     }
 }

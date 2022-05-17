@@ -5,23 +5,19 @@ const adressService = new AdressService()
 
 export class AdressController {
     async create(request: Request, response: Response){
-        const params = request.params;
-      
         const adress = request.body;
  
-        const createAdress = await adressService.create(params, adress);
+        const createAdress = await adressService.create(adress);
 
         if(createAdress instanceof Error) return response.status(400).json(createAdress.message);
 
-        const result =  await adressService.updateFk(params, createAdress);
+        const result =  await adressService.updateFk(request.personId, createAdress);
 
         return response.json(result);
     }
 
     async findAll(request: Request, response: Response) {
-        const params = request.params;
-
-        const result = await adressService.findAll(params);
+        const result = await adressService.findAll(request.personId);
 
         if(result instanceof Error) return response.status(400).json(result.message);
 

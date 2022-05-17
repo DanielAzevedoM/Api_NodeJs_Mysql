@@ -2,23 +2,17 @@ import { getRepository } from 'typeorm';
 import { Person as PersonEntity } from '../../models/person/person.entity'; 
 import { Person } from '../../interfaces/person/person.interface';
 import { User as UserEntity} from '../../models/user/user.entity';
-import { UpdatePerson } from '../../interfaces/person/person.update.interface';
+
 
 
 export class PersonService {
-  	async create(param, person: Person): Promise<PersonEntity | Error>{
-        const userRepository = getRepository(UserEntity);
-
+  	async create(person: Person): Promise<PersonEntity | Error>{
         const personRepository = getRepository(PersonEntity);
-
-        const findUser = await userRepository.findOne({ id: param.userId});
-
-        if(!findUser) return new Error("User not Exists")
 
 		return personRepository.save(person)
     }  
 
-    async updateFk(id: string, person: Person): Promise<UserEntity | Error>{
+    async updateFk(id: string, person: Person): Promise<Person | Error>{
         const userRepository = getRepository(UserEntity);
 
 		const findUser = await userRepository.findOne({ id: id});
@@ -27,83 +21,71 @@ export class PersonService {
 
 		const userUpdate = {
 			...findUser,
-			person: person,
+			personId: person.id,
 		
 		}
+		
+		await userRepository.save(userUpdate);    
 
-		return userRepository.save(userUpdate);    
+		return person;
     }
 
-    async remove(params): Promise<PersonEntity | Error>{
-        const userRepository = getRepository(UserEntity);
+    async remove(id: string): Promise<PersonEntity | Error>{
+		const personRepository = getRepository(PersonEntity)
 
-        const personRepository = getRepository(PersonEntity);
-
-		const findUser = await userRepository.findOne({ id: params.userId});
-       
-		const findPerson = await personRepository.findOne({ id: findUser.personId});
-
-		if(!findUser) return new Error("User not exists!");
-		if(!findPerson) return new Error("Person not exists!");
-
-		const userUpdate = {
-			...findUser,
-			personId: null
-		}
-
-		await userRepository.save(userUpdate);
-
-		return personRepository.remove(findPerson)
-	}
-
-	async findOne(params): Promise<PersonEntity | Error>{
 		const userRepository = getRepository(UserEntity);
 
-        const personRepository = getRepository(PersonEntity);
+		const findUser = await userRepository.findOne({ personId: id});
+		
+		if(findUser.personId !== null){
 
-		const findUser = await userRepository.findOne({ id: params.userId});
+			const findPerson = await personRepository.findOne({ id })
 
-		const findPerson = await personRepository.findOne({ id: findUser.personId});
+			const userUpdate = {
+				...findUser,
+				personId: null
+			}
 
-		if(!findUser) return new Error("User not exists!");
+			await userRepository.save(userUpdate);
+
+			return personRepository.remove(findPerson)
+			
+		} else {
+			 return new Error("Person not exists!");
+		}
+	}
+
+	async findOne(id: string): Promise<PersonEntity | Error>{
+		const personRepository = getRepository(PersonEntity);
+
+		const findPerson = await personRepository.findOne({ id });
+
 		if(!findPerson) return new Error("Person not exists!");
 	
 		return findPerson;
 	}
 
-	async update(params, person: UpdatePerson): Promise<PersonEntity | Error>{
-        const userRepository = getRepository(UserEntity);
-
+	async update(id: string, person: Person): Promise<PersonEntity | Error>{
         const personRepository = getRepository(PersonEntity);
 
-		const findUser = await userRepository.findOne({ id: params.userId});
+		const findPerson = await personRepository.findOne({ id });
 
-		const findPerson = await personRepository.findOne({ id: findUser.personId});
-
-		if(!findUser) return new Error("User not exists!");
 		if(!findPerson) return new Error("Person not exists!");
 
         const personUpdate = {
             ...findPerson,
-            name: person.newName,
-            gender: person.newGender,
-			birthday: person.newBirthday
+            ...person
         }
 
          return personRepository.save(personUpdate);    
     }
 
-	async updateSelfie(params, selfie: string){
-		const userRepository = getRepository(UserEntity);
-
+	async updateSelfie(id: string, selfie: string): Promise<PersonEntity | Error >{
         const personRepository = getRepository(PersonEntity);
 
-		const findUser = await userRepository.findOne({ id: params.userId });
+		const findPerson = await personRepository.findOne({ id });
 
-		const findPerson = await personRepository.findOne({ id: findUser.personId });
-
-		if(!findUser) return null;
-		if(!findPerson) return null;
+		if(!findPerson) return new Error("Person not exists!");
 
 		const updateSelfie = {
 			...findPerson,

@@ -8,24 +8,20 @@ class PersonController {
     async create(request: Request, response: Response){
         const person = request.body;
 
-        const params = request.params;
+        await personService.remove(request.personId)
 
-        await personService.remove(params)
-
-        const createPerson = await personService.create(params, person);
+        const createPerson = await personService.create(person);
 
         if(createPerson instanceof Error) return response.status(400).json(createPerson.message);
 
-        const result = await personService.updateFk(params.userId, createPerson)
+        const result = await personService.updateFk(request.id, createPerson)
 
         return response.json(result);
     }
 
 
     async findOne(request: Request, response: Response){
-        const params = request.params;
-
-        const result = await personService.findOne(params);
+        const result = await personService.findOne(request.personId);
 
         if(result instanceof Error) return response.status(400).json(result.message);
     
@@ -35,9 +31,7 @@ class PersonController {
     async update(request: Request, response: Response){
         const person = request.body;
 
-        const params = request.params;
-        
-        const result = await personService.update(params, person)
+        const result = await personService.update(request.personId, person)
 
         if(result instanceof Error) return response.status(400).json(result.message);
 
@@ -45,21 +39,18 @@ class PersonController {
     }
 
     async remove(request: Request, response: Response){
-        const params = request.params;
-
-        const result = await personService.remove(params);
+      
+        const result = await personService.remove(request.personId);
         
         if(result instanceof Error) return response.status(400).json(result.message);
 
         return response.json(result)
     }
 
-    async updateSelfie(request, response){
-        const params = request.params;
-
+    async updateSelfie(request, response: Response){
         const file = request.file;
 
-        const result = await personService.updateSelfie(params, file.path)
+        const result = await personService.updateSelfie(request.personId , file.path)
 
         return response.json(result);
     }

@@ -1,62 +1,64 @@
-import { getRepository } from 'typeorm';
+import { getRepository,  } from 'typeorm';
 import { User as UserEntity} from '../../models/user/user.entity';
+import { encondePassword } from '../../utils/bcrypt';
 import { User } from '../../interfaces/user/user.interface';
-import { UpdateUser } from '../../interfaces/user/user.update.interface'
-
 
 
 export class UserService { 
-    async create(user: User): Promise<UserEntity| Error>{
-        const userRepository =  getRepository(UserEntity)
-        
-        const checkUserExists = await userRepository.findOne({email: user.email})
-        
-        if(checkUserExists) return new Error("Email already exits!")
-        
-        return  userRepository.save(user);
-
-    }
-    
-    async findAll(): Promise<UserEntity[]> {    
+     async findAll(): Promise<UserEntity[]> {    
         const userRepository =  getRepository(UserEntity)
 
-        return userRepository.find()
+        let result = await userRepository.find({ isDeleted: false })
+
+        for(let user of result){
+            delete user.password
+        }
+
+        return result
     }
 
     async findOne(id: string): Promise<UserEntity | Error>{
         const userRepository =  getRepository(UserEntity)
 
-        const findUser = await userRepository.findOne({ id: id});
+        const findUser = await userRepository.findOne({id});
 
         if(!findUser) return new Error("User not exists");
+
+        delete findUser.password;
         
         return findUser;
     }
 
-    async update( params,  user:  UpdateUser): Promise<UserEntity | Error>{
+    async update( id: string,  user: User): Promise<UserEntity | Error>{
         const userRepository =  getRepository(UserEntity);
      
-        const findUser = await userRepository.findOne({ id: params.id});
+        const findUser = await userRepository.findOne({id});
 
-        const checkUserExists = await userRepository.findOne({email: user.newEmail})
+        const checkUserExists = await userRepository.findOne({email: user.email})
+
+        if(!findUser) return new Error("User not exists");
         
         if(checkUserExists) return new Error("Email already exits!");
 
-        if(!findUser) return new Error("User not exists");
+        const passwordEncoded = await encondePassword(user.password);
 
         const userUpdate = {
             ...findUser,
-            email: user.newEmail,
-            password: user.newPassword
+            email: user.email,
+            password: passwordEncoded
         }
 
-         return userRepository.save(userUpdate);    
+        const result = await userRepository.save(userUpdate);    
+
+        delete result.password;
+
+        return result;
     }
 
     async remove(id: string): Promise<UserEntity | Error>{
         const userRepository =  getRepository(UserEntity);
 
-        const findUser = await userRepository.findOne({ id: id});
+        const findUser = await userRepository.findOne({ id });
 
         if(!findUser) return new Error("User not exists");
 

@@ -4,13 +4,13 @@ import jwt from 'jsonwebtoken';
 
 interface tokenPayLoad {
     id: string,
+    email: string,
+    personId: string,
     iat: number,
     exp: number
 }
 
-export default function AuthMiddleware(
-    req: Request, res: Response, next: NextFunction
-) {
+export default function AuthMiddleware(req: Request, res: Response, next: NextFunction) {
     const { authorization } = req.headers;
 
     if(!authorization){
@@ -18,14 +18,22 @@ export default function AuthMiddleware(
     }
 
     const token = authorization.replace('Bearer', '').trim();
-  
+
     try{
 
-      jwt.verify(token, 'secret');
+    const data = jwt.verify(token, 'secret');
 
-      return next()
+    const { id, email, personId } = data as tokenPayLoad;
+
+    req.id = id;
+    req.email = email;
+    req.personId = personId
+
+    return next()
 
     } catch{
         return res.sendStatus(401)
     }
+
+    
 }
